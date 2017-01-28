@@ -22,10 +22,32 @@ console.log(changedPerson);
 
 var reducer = (state = {name: 'Anonymous'}, action) => {
   // var state = state || {name : 'Anonymous'};
+
+  console.log('New Action', action);
+
+  switch(action.type) {
+    case 'CHANGE_NAME':
+      return {
+        ...state,
+        name: action.name
+      };
+    default:
+      return state;
+  }
+
   return state;
 };
 // Starting of our main Redux App Example
-var Store = redux.createStore(reducer);
+var store = redux.createStore(reducer);
 
-var currentState = Store.getState();
+var currentState = store.getState();
 console.log('current state', currentState);
+
+var action = {
+  type: 'CHANGE_NAME',
+  name: 'Andrew'
+}
+
+store.dispatch(action);
+
+console.log('Name should be andrew', store.getState());
