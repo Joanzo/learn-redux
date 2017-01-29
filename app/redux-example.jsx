@@ -1,4 +1,7 @@
 var redux = require('redux');
+
+
+
 /*
 console.log('Starting redux example');
 
@@ -80,139 +83,46 @@ var oldreducer = (state = stateDefault, action) => {
 */
 
 
-var nextHobbyId = 1;
-var nextMovieId = 1;
 
-// Name reducer and action generators
-// --------------------
-var nameReducer = (state = 'Anonymous', action) => {
-  switch (action.type) {
-    case 'CHANGE_NAME':
-      return action.name;
-    default:
-      return state;
-  };
-};
-
-var changeName = (name) => {
-  return {
-    type: 'CHANGE_NAME',
-    name
-    // above same with below
-    // name: name
-  }
-};
-
-
-// Hobbies reducer and action generators
-// --------------------
-var hobbiesReducer = (state = [], action) => {
-  switch (action.type) {
-    case 'ADD_HOBBY':
-      return [
-        ...state,
-        {
-          id: nextHobbyId++,
-          hobby: action.hobby
-        }
-      ];
-    case 'REMOVE_HOBBY':
-      return state.filter((hobby) => hobby.id !== action.id)
-    default:
-      return state;
-  };
-};
-
-var addHobby = (hobby) => {
-  return {
-    type: 'ADD_HOBBY',
-    hobby
-  }
-};
-
-var removeHobby = (id) => {
-  return {
-    type: 'REMOVE_HOBBY',
-    id
-  }
-};
-
-// Movies reducer and action generators
-// --------------------
-var moviesReducer = (state = [], action) => {
-  switch (action.type) {
-    case 'ADD_MOVIE':
-      return [
-        ...state,
-        {
-          id: nextMovieId++,
-          title: action.title,
-          genre: action.genre
-        }
-      ];
-    case 'REMOVE_MOVIE':
-      return state.filter((movie) => movie.id !== action.id)
-    default:
-      return state;
-  };
-};
-
-var addMovie = (title, genre) => {
-  return {
-    type: 'ADD_MOVIE',
-    title,
-    genre
-  }
-};
-
-var removeMovie = (id) => {
-  return {
-    type: 'REMOVE_MOVIE',
-    id
-  }
-};
-
-
-
-var reducer = redux.combineReducers({
-  name: nameReducer,
-  hobbies: hobbiesReducer,
-  movies: moviesReducer
-});
-
-// Starting of our main Redux App Example
-var store = redux.createStore(reducer, redux.compose(
-  window.devToolsExtension ? window.devToolsExtension() : f => f
-));
+var actions = require('./actions/index');
+var store = require('./store/configureStore').configure();
 
 // Subscribe to changes
 var unsubscribe = store.subscribe(() => {
   var state = store.getState();
-  console.log('Name is', state.name);
-  document.getElementById('app').innerHTML = state.name;
+  // console.log('Name is', state.name);
+  // document.getElementById('app').innerHTML = state.name;
 
   console.log('New State: ', store.getState());
+
+  if (state.map.isFetching) {
+    document.getElementById('app').innerHTML = 'Loading...';
+  } else if (state.map.url) {
+    document.getElementById('app').innerHTML = '<a href="'+state.map.url+'" href="_blank">View Your Location</a>'
+  }
+
 });
 // unsubscribe();
 var currentState = store.getState();
 console.log('current state', currentState);
 
+store.dispatch(actions.fetchLocation());
 
-store.dispatch(changeName('Andrew'));
+store.dispatch(actions.changeName('Andrew'));
 
-store.dispatch(addHobby('Running'));
+store.dispatch(actions.addHobby('Running'));
 
-store.dispatch(addHobby('Walking'));
+store.dispatch(actions.addHobby('Walking'));
 
-store.dispatch(removeHobby(2));
+store.dispatch(actions.removeHobby(2));
 
-store.dispatch(changeName('Emily'));
+store.dispatch(actions.changeName('Emily'));
 
-store.dispatch(addMovie('The Avengers 2', 'Action'));
+store.dispatch(actions.addMovie('The Avengers 2', 'Action'));
 
-store.dispatch(addMovie('Iron Man 3', 'Action'));
+store.dispatch(actions.addMovie('Iron Man 3', 'Action'));
 
-store.dispatch(removeMovie(2));
+store.dispatch(actions.removeMovie(2));
 
 
 /*
